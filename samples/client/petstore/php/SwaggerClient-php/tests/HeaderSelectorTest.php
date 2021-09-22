@@ -1,10 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
-class HeaderSelectorTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class HeaderSelectorTest extends TestCase
 {
-    public function testSelectingHeaders()
+    public function testSelectingHeaders(): void
     {
         $selector = new HeaderSelector();
         $headers = $selector->selectHeaders([
@@ -38,7 +41,7 @@ class HeaderSelectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('application/yaml,application/xml', $headers['Content-Type']);
     }
 
-    public function testSelectingHeadersForMultipartBody()
+    public function testSelectingHeadersForMultipartBody(): void
     {
         // test selectHeaderAccept
         $selector = new HeaderSelector();

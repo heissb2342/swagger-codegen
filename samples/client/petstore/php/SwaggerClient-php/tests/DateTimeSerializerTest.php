@@ -2,11 +2,12 @@
 
 namespace Swagger\Client;
 
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Model\FormatTest;
 
-class DateTimeSerializerTest extends \PHPUnit_Framework_TestCase
+class DateTimeSerializerTest extends TestCase
 {
-    public function testDateTimeSanitazion()
+    public function testDateTimeSanitation(): void
     {
         $dateTime = new \DateTime('April 30, 1973 17:05 CEST');
 
@@ -16,10 +17,10 @@ class DateTimeSerializerTest extends \PHPUnit_Framework_TestCase
 
         $data = ObjectSerializer::sanitizeForSerialization($input);
 
-        $this->assertEquals($data->dateTime, '1973-04-30T17:05:00+02:00');
+        $this->assertEquals('1973-04-30T17:05:00+02:00', $data->dateTime);
     }
 
-    public function testDateSanitazion()
+    public function testDateSanitation(): void
     {
         $dateTime = new \DateTime('April 30, 1973 17:05 CEST');
 
@@ -29,6 +30,6 @@ class DateTimeSerializerTest extends \PHPUnit_Framework_TestCase
 
         $data = ObjectSerializer::sanitizeForSerialization($input);
 
-        $this->assertEquals($data->date, '1973-04-30');
+        $this->assertEquals('1973-04-30', $data->date);
     }
 }

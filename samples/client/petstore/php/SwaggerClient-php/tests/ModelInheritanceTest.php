@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Model\Animal;
 use Swagger\Client\Model\AnimalFarm;
 use Swagger\Client\Model\Cat;
@@ -12,12 +14,12 @@ use Swagger\Client\Model\Dog;
  *
  * @package Swagger\Client
  */
-class ModelInheritanceTest extends \PHPUnit_Framework_TestCase
+class ModelInheritanceTest extends TestCase
 {
     /**
      * test if default values works
      */
-    public function testDefaultValues()
+    public function testDefaultValues(): void
     {
         // add some animals to the farm to make sure the ArrayAccess
         // interface works
@@ -33,7 +35,7 @@ class ModelInheritanceTest extends \PHPUnit_Framework_TestCase
     /**
      * test inheritance in the model
      */
-    public function testInheritance()
+    public function testInheritance(): void
     {
         $newDog = new Dog;
         // the object should be an instance of the derived class
@@ -45,7 +47,7 @@ class ModelInheritanceTest extends \PHPUnit_Framework_TestCase
     /**
      * test inheritance constructor is working with data initialization
      */
-    public function testInheritanceConstructorDataInitialization()
+    public function testInheritanceConstructorDataInitialization(): void
     {
         // initialize the object with data in the constructor
         $data = [
@@ -63,7 +65,7 @@ class ModelInheritanceTest extends \PHPUnit_Framework_TestCase
     /**
      * test if discriminator is initialized automatically
      */
-    public function testDiscriminatorInitialization()
+    public function testDiscriminatorInitialization(): void
     {
         $newDog = new Dog();
         $this->assertSame('Dog', $newDog->getClassName());
@@ -72,7 +74,7 @@ class ModelInheritanceTest extends \PHPUnit_Framework_TestCase
     /**
      * test if ArrayAccess interface works
      */
-    public function testArrayStuff()
+    public function testArrayStuff(): void
     {
         // create an AnimalFarm which is an object implementing the ArrayAccess interface
         $farm = new AnimalFarm();
@@ -90,7 +92,7 @@ class ModelInheritanceTest extends \PHPUnit_Framework_TestCase
         // let's try to `foreach` the animals in the farm and let's try to use the objects we loop through
         foreach ($farm as $animal) {
             $this->assertContains($animal->getClassName(), ['Dog', 'Cat', 'Animal']);
-            $this->assertInstanceOf('Swagger\Client\Model\Animal', $animal);
+            $this->assertInstanceOf(Animal::class, $animal);
         }
     }
 }

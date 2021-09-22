@@ -1,20 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
 use GuzzleHttp\Client;
+use PHPUnit\Framework\TestCase;
 
-class ExceptionTest extends \PHPUnit_Framework_TestCase
+class ExceptionTest extends TestCase
 {
-    /**
-     * @expectedException \Swagger\Client\ApiException
-     * @expectedExceptionCode 404
-     * @expectedExceptionMessage http://petstore.swagger.io/INVALID_URL/store/inventory
-     */
-    public function testNotFound()
+    public function testNotFound(): void
     {
+        $this->expectException(ApiException::class);
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('https://petstore.swagger.io/INVALID_URL/store/inventory');
+
         $config = new Configuration();
-        $config->setHost('http://petstore.swagger.io/INVALID_URL');
+        $config->setHost('https://petstore.swagger.io/INVALID_URL');
 
         $api = new Api\StoreApi(
             new Client(),
@@ -23,12 +24,11 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
         $api->getInventory();
     }
 
-    /**
-     * @expectedException \Swagger\Client\ApiException
-     * @expectedExceptionMessage Could not resolve host
-     */
-    public function testWrongHost()
+    public function testWrongHost(): void
     {
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Could not resolve host');
+
         $config = new Configuration();
         $config->setHost('http://wrong_host.zxc');
 

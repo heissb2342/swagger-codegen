@@ -1,21 +1,25 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
 use Exception;
 use GuzzleHttp\Client;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Api\PetApi;
+use Swagger\Client\Model\Animal;
 use Swagger\Client\Model\ApiResponse;
+use Swagger\Client\Model\Cat;
+use Swagger\Client\Model\Dog;
 use Swagger\Client\Model\Pet;
 
-class PetApiTest extends \PHPUnit_Framework_TestCase
+class PetApiTest extends TestCase
 {
-
-    /** @var  PetApi */
-    private $api;
+    private PetApi $api;
 
     // add a new pet (id 10005) to ensure the pet object is available for all the tests
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         // increase memory limit to avoid fatal error due to findPetByStatus
         // returning a lot of data
@@ -28,16 +32,16 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
         $newPetId = 10005;
         $newPet = new Model\Pet;
         $newPet->setId($newPetId);
-        $newPet->setName("PHP Unit Test");
-        $newPet->setPhotoUrls(["http://test_php_unit_test.com"]);
+        $newPet->setName('PHP Unit Test');
+        $newPet->setPhotoUrls(['https://test_php_unit_test.com']);
         // new tag
         $tag = new Model\Tag;
         $tag->setId($newPetId); // use the same id as pet
-        $tag->setName("test php tag");
+        $tag->setName('test php tag');
         // new category
         $category = new Model\Category;
         $category->setId($newPetId); // use the same id as pet
-        $category->setName("test php category");
+        $category->setName('test php category');
 
         $newPet->setTags(array($tag));
         $newPet->setCategory($category);
@@ -47,78 +51,54 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
         $petApi = new Api\PetApi($client, $config);
 
         // add a new pet (model)
-        list(, $status) = $petApi->addPetWithHttpInfo($newPet);
-        \PHPUnit_Framework_Assert::assertEquals(200, $status);
+        [, $status] = $petApi->addPetWithHttpInfo($newPet);
+        self::assertEquals(200, $status);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->api = new Api\PetApi();
     }
 
-    public function testGetPetById()
+    public function testGetPetById(): void
     {
         $petId = 10005;
 
-        $pet = $this->api->getPetById($petId);
-        $this->assertSame($pet->getId(), $petId);
-        $this->assertSame($pet->getName(), 'PHP Unit Test');
-        $this->assertSame($pet->getPhotoUrls()[0], 'http://test_php_unit_test.com');
-        $this->assertSame($pet->getCategory()->getId(), $petId);
-        $this->assertSame($pet->getCategory()->getName(), 'test php category');
-        $this->assertSame($pet->getTags()[0]->getId(), $petId);
-        $this->assertSame($pet->getTags()[0]->getName(), 'test php tag');
+        $this->spin(function () use ($petId) {
+            $pet = $this->api->getPetById($petId);
+            $this->assertSame($pet->getId(), $petId);
+            $this->assertSame($pet->getName(), 'PHP Unit Test');
+            $this->assertSame($pet->getPhotoUrls()[0], 'https://test_php_unit_test.com');
+            $this->assertSame($pet->getCategory()->getId(), $petId);
+            $this->assertSame($pet->getCategory()->getName(), 'test php category');
+            $this->assertSame($pet->getTags()[0]->getId(), $petId);
+            $this->assertSame($pet->getTags()[0]->getName(), 'test php tag');
+        });
     }
 
-    /**
-     * comment out as we've removed invalid endpoints from the spec, we'll introduce something
-     * similar in the future when we've time to update the petstore server
-     *
-     * // test getPetById with a Pet object (id 10005)
-     * public function testGetPetByIdInObject()
-     * {
-     * // initialize the API client without host
-     * $pet_id = 10005;  // ID of pet that needs to be fetched
-     * $pet_api = new Api\PetApi();
-     * $pet_api->getApiClient()->getConfig()->setApiKey('api_key', '111222333444555');
-     * // return Pet (inline model)
-     * $response = $pet_api->getPetByIdInObject($pet_id);
-     * $this->assertInstanceOf('Swagger\Client\Model\InlineResponse200', $response);
-     * $this->assertSame($response->getId(), $pet_id);
-     * $this->assertSame($response->getName(), 'PHP Unit Test');
-     * $this->assertSame($response->getPhotoUrls()[0], 'http://test_php_unit_test.com');
-     *
-     * // category is type "object"
-     * $this->assertInternalType('array', $response->getCategory());
-     * $this->assertSame($response->getCategory()['id'], $pet_id);
-     * $this->assertSame($response->getCategory()['name'], 'test php category');
-     *
-     * $this->assertSame($response->getTags()[0]->getId(), $pet_id);
-     * $this->assertSame($response->getTags()[0]->getName(), 'test php tag');
-     * }
-     */
-
     // test getPetByIdWithHttpInfo with a Pet object (id 10005)
-    public function testGetPetByIdWithHttpInfo()
+    public function testGetPetByIdWithHttpInfo(): void
     {
         // initialize the API client without host
         $petId = 10005;  // ID of pet that needs to be fetched
 
-        /** @var $pet Pet */
-        list($pet, $status_code, $response_headers) = $this->api->getPetByIdWithHttpInfo($petId);
-        $this->assertSame($pet->getId(), $petId);
-        $this->assertSame($pet->getName(), 'PHP Unit Test');
-        $this->assertSame($pet->getCategory()->getId(), $petId);
-        $this->assertSame($pet->getCategory()->getName(), 'test php category');
-        $this->assertSame($pet->getTags()[0]->getId(), $petId);
-        $this->assertSame($pet->getTags()[0]->getName(), 'test php tag');
-        $this->assertSame($status_code, 200);
-        $this->assertSame($response_headers['Content-Type'], ['application/json']);
+        $this->spin(function () use ($petId) {
+            /** @var $pet Pet */
+            [$pet, $status_code, $response_headers] = $this->api->getPetByIdWithHttpInfo($petId);
+            $this->assertSame($pet->getId(), $petId);
+            $this->assertSame($pet->getName(), 'PHP Unit Test');
+            $this->assertSame($pet->getCategory()->getId(), $petId);
+            $this->assertSame($pet->getCategory()->getName(), 'test php category');
+            $this->assertSame($pet->getTags()[0]->getId(), $petId);
+            $this->assertSame($pet->getTags()[0]->getName(), 'test php tag');
+            $this->assertSame($status_code, 200);
+            $this->assertSame($response_headers['Content-Type'], ['application/json']);
+        });
     }
 
-    public function testFindPetByStatus()
+    public function testFindPetByStatus(): void
     {
-        $response = $this->api->findPetsByStatus('available');
+        $response = $this->api->findPetsByStatus(['available']);
         $this->assertGreaterThan(0, count($response)); // at least one object returned
 
         $this->assertSame(get_class($response[0]), Pet::class); // verify the object is Pet
@@ -126,13 +106,13 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($pet['status'], 'available');
         }
 
-        $response = $this->api->findPetsByStatus('unknown_and_incorrect_status');
+        $response = $this->api->findPetsByStatus(['unknown_and_incorrect_status']);
         $this->assertCount(0, $response);
     }
 
-    public function testFindPetsByTags()
+    public function testFindPetsByTags(): void
     {
-        $response = $this->api->findPetsByTags('test php tag');
+        $response = $this->api->findPetsByTags(['test php tag']);
         $this->assertGreaterThan(0, count($response)); // at least one object returned
         $this->assertSame(get_class($response[0]), Pet::class); // verify the object is Pet
 
@@ -140,19 +120,18 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($pet['tags'][0]['name'], 'test php tag');
         }
 
-        $response = $this->api->findPetsByTags('unknown_and_incorrect_tag');
+        $response = $this->api->findPetsByTags(['unknown_and_incorrect_tag']);
         $this->assertCount(0, $response);
     }
 
-    public function testUpdatePet()
+    public function testUpdatePet(): void
     {
         $petId = 10001;
         $updatedPet = new Model\Pet;
         $updatedPet->setId($petId);
         $updatedPet->setName('updatePet');
         $updatedPet->setStatus('pending');
-        $result = $this->api->updatePet($updatedPet);
-        $this->assertNull($result);
+        $this->api->updatePet($updatedPet);
 
         // verify updated Pet
         $this->spin(function () use ($petId) {
@@ -164,12 +143,12 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
     }
 
     // test updatePetWithFormWithHttpInfo and verify by the "name" of the response
-    public function testUpdatePetWithFormWithHttpInfo()
+    public function testUpdatePetWithFormWithHttpInfo(): void
     {
         $petId = 10001;  // ID of pet that needs to be fetched
 
         // update Pet (form)
-        list($update_response, $status_code, $http_headers) = $this->api->updatePetWithFormWithHttpInfo(
+        [$update_response, $status_code, $http_headers] = $this->api->updatePetWithFormWithHttpInfo(
             $petId,
             'update pet with form with http info'
         );
@@ -186,12 +165,10 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
     }
 
     // test updatePetWithForm and verify by the "name" and "status" of the response
-    public function testUpdatePetWithForm()
+    public function testUpdatePetWithForm(): void
     {
         $pet_id = 10001;  // ID of pet that needs to be fetched
-        $result = $this->api->updatePetWithForm($pet_id, 'update pet with form', 'sold');
-        // return nothing (void)
-        $this->assertNull($result);
+        $this->api->updatePetWithForm($pet_id, 'update pet with form', 'sold');
 
         $this->spin(function () use ($pet_id) {
             $response = $this->api->getPetById($pet_id);
@@ -202,17 +179,15 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
     }
 
     // test addPet and verify by the "id" and "name" of the response
-    public function testAddPet()
+    public function testAddPet(): void
     {
         $new_pet_id = 10006;
         $newPet = new Model\Pet;
         $newPet->setId($new_pet_id);
-        $newPet->setName("PHP Unit Test 2");
+        $newPet->setName('PHP Unit Test 2');
 
         // add a new pet (model)
-        $add_response = $this->api->addPet($newPet);
-        // return nothing (void)
-        $this->assertNull($add_response);
+        $this->api->addPet($newPet);
 
         // verify added Pet
         $response = $this->api->getPetById($new_pet_id);
@@ -220,49 +195,8 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($response->getName(), 'PHP Unit Test 2');
     }
 
-    /*
-     * comment out as we've removed invalid endpoints from the spec, we'll introduce something
-     * similar in the future when we've time to update the petstore server
-     *
-    // test addPetUsingByteArray and verify by the "id" and "name" of the response
-    public function testAddPetUsingByteArray()
-    {
-        // initialize the API client
-        $config = (new Configuration())->setHost('http://petstore.swagger.io/v2');
-        $api_client = new ApiClient($config);
-
-        $new_pet_id = 10005;
-        $new_pet = new Model\Pet;
-        $new_pet->setId($new_pet_id);
-        $new_pet->setName("PHP Unit Test 3");
-        // new tag
-        $tag= new Model\Tag;
-        $tag->setId($new_pet_id); // use the same id as pet
-        $tag->setName("test php tag");
-        // new category
-        $category = new Model\Category;
-        $category->setId($new_pet_id); // use the same id as pet
-        $category->setName("test php category");
-  
-        $new_pet->setTags(array($tag));
-        $new_pet->setCategory($category);
-
-        $pet_api = new Api\PetApi($api_client);
-        // add a new pet (model)
-        $object_serializer = new ObjectSerializer();
-        $pet_json_string = json_encode($object_serializer->sanitizeForSerialization($new_pet));
-        $add_response = $pet_api->addPetUsingByteArray($pet_json_string);
-        // return nothing (void)
-        $this->assertSame($add_response, NULL);
-        // verify added Pet
-        $response = $pet_api->getPetById($new_pet_id);
-        $this->assertSame($response->getId(), $new_pet_id);
-        $this->assertSame($response->getName(), 'PHP Unit Test 3');
-    }
-     */
-
     // test upload file
-    public function testUploadFile()
+    public function testUploadFile(): void
     {
         // upload file
         $pet_id = 10001;
@@ -271,56 +205,27 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ApiResponse::class, $response);
     }
 
-    /*
-     * comment out as we've removed invalid endpoints from the spec, we'll introduce something
-     * similar in the future when we've time to update the petstore server
-     *
-    // test byte array response
-    public function testGetPetByIdWithByteArray()
-    {
-        // initialize the API client
-        $config = new Configuration();
-        $config->setHost('http://petstore.swagger.io/v2');
-        $api_client = new APIClient($config);
-        $pet_api = new Api\PetApi($api_client);
-        // test getPetByIdWithByteArray 
-        $pet_id = 10005;
-        $bytes = $pet_api->petPetIdtestingByteArraytrueGet($pet_id);
-        $json = json_decode($bytes, true);
-
-        $this->assertInternalType("string", $bytes);
-
-        $this->assertSame($json['id'], $pet_id);
-        // not testing name as it's tested by addPetUsingByteArray
-        //$this->assertSame($json['name'], 'PHP Unit Test');
-        $this->assertSame($json['category']['id'], $pet_id);
-        $this->assertSame($json['category']['name'], 'test php category');
-        $this->assertSame($json['tags'][0]['id'], $pet_id);
-        $this->assertSame($json['tags'][0]['name'], 'test php tag');
-    }
-     */
-
     // test empty object serialization
-    public function testEmptyPetSerialization()
+    public function testEmptyPetSerialization(): void
     {
         $new_pet = new Model\Pet;
         // the empty object should be serialised to {}
-        $this->assertSame("{}", "$new_pet");
+        $this->assertSame("{}", (string)$new_pet);
     }
 
     // test inheritance in the model
-    public function testInheritance()
+    public function testInheritance(): void
     {
         $new_dog = new Model\Dog;
         // the object should be an instance of the derived class
-        $this->assertInstanceOf('Swagger\Client\Model\Dog', $new_dog);
+        $this->assertInstanceOf(Dog::class, $new_dog);
         // the object should also be an instance of the parent class
-        $this->assertInstanceOf('Swagger\Client\Model\Animal', $new_dog);
+        $this->assertInstanceOf(Animal::class, $new_dog);
     }
 
     // test inheritance constructor is working with data
     // initialization
-    public function testInheritanceConstructorDataInitialization()
+    public function testInheritanceConstructorDataInitialization(): void
     {
         // initialize the object with data in the constructor
         $data = array(
@@ -336,14 +241,14 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
     }
 
     // test if discriminator is initialized automatically
-    public function testDiscriminatorInitialization()
+    public function testDiscriminatorInitialization(): void
     {
         $new_dog = new Model\Dog();
         $this->assertSame('Dog', $new_dog->getClassName());
     }
 
     // test if ArrayAccess interface works
-    public function testArrayStuff()
+    public function testArrayStuff(): void
     {
         // create an AnimalFarm which is an object implementing the
         // ArrayAccess interface
@@ -357,20 +262,20 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
 
         // assert we can look up the animals in the farm by array
         // indices (let's try a random order)
-        $this->assertInstanceOf('Swagger\Client\Model\Cat', $farm[1]);
-        $this->assertInstanceOf('Swagger\Client\Model\Dog', $farm[0]);
-        $this->assertInstanceOf('Swagger\Client\Model\Animal', $farm[2]);
+        $this->assertInstanceOf(Cat::class, $farm[1]);
+        $this->assertInstanceOf(Dog::class, $farm[0]);
+        $this->assertInstanceOf(Animal::class, $farm[2]);
 
         // let's try to `foreach` the animals in the farm and let's
         // try to use the objects we loop through
         foreach ($farm as $animal) {
             $this->assertContains($animal->getClassName(), array('Dog', 'Cat', 'Animal'));
-            $this->assertInstanceOf('Swagger\Client\Model\Animal', $animal);
+            $this->assertInstanceOf(Animal::class, $animal);
         }
     }
 
     // test if default values works
-    public function testDefaultValues()
+    public function testDefaultValues(): void
     {
         // add some animals to the farm to make sure the ArrayAccess
         // interface works
@@ -383,45 +288,25 @@ class PetApiTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('red', $animal->getColor());
     }
 
-    /**
-     * test invalid argument
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Missing the required parameter $status when calling findPetsByStatus
-     */
-    public function testInvalidArgument()
+    public function testInvalidArgument(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing the required parameter $status when calling findPetsByStatus');
         // the argument is required, and we must specify one or some from 'available', 'pending', 'sold'
         $this->api->findPetsByStatus([]);
     }
 
-//    Disabled as currently we don't have any endpoint that would return file
-//    For testing I just replaced url and return type in Api method.
-//    public function testDownloadingLargeFile()
-//    {
-//        $petId = 10005;
-//        $config = new Configuration();
-//        $config->setHost('https://getcomposer.org');
-//        $api = new PetApi(new Client(), $config);
-//        $result = $api->getPetById($petId);
-//        $this->assertInstanceOf(\SplFileObject::class, $result);
-//        var_dump([
-//            'peak mem (MiB)' => memory_get_peak_usage(true)/1024/1024,
-//            'file size (MiB)' => $result->getSize()/1024/1024,
-//            'path' => sys_get_temp_dir() . '/' . $result->getFilename()
-//        ]);
-//    }
-
     /**
      * @throws Exception
      */
-    private function spin($callable, $maxWaitTimeSeconds = 5, $waitingIntervalSeconds = 1)
+    private function spin(callable $callable, int $maxWaitTimeSeconds = 10, int $waitingIntervalSeconds = 1): void
     {
         $exception = null;
 
         for ($index = 0; $index < $maxWaitTimeSeconds; $index++) {
             try {
-                return $callable($this);
+                $callable($this);
+                return;
             } catch (Exception $exception) {
                 // only rethrow the latest exception when timing out
             }

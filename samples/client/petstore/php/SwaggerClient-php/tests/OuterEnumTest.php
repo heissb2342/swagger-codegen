@@ -1,26 +1,30 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Model\EnumTest;
 use Swagger\Client\Model\OuterEnum;
 
-class OuterEnumTest extends \PHPUnit_Framework_TestCase
+class OuterEnumTest extends TestCase
 {
-    public function testDeserialize()
+    public function testDeserialize(): void
     {
         $result = ObjectSerializer::deserialize(
             "placed",
             OuterEnum::class
         );
 
-        $this->assertInternalType('string', $result);
+        $this->assertIsString($result);
         $this->assertEquals('placed', $result);
     }
 
-    public function testDeserializeInvalidValue()
+    public function testDeserializeInvalidValue(): void
     {
-        $this->setExpectedException(\InvalidArgumentException::class, 'Invalid value for enum');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid value for enum');
 
         ObjectSerializer::deserialize(
             "lkjfalgkdfjg",
@@ -28,7 +32,7 @@ class OuterEnumTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testDeserializeNested()
+    public function testDeserializeNested(): void
     {
         $json = '{
             "enum_string": "UPPER",
@@ -39,7 +43,7 @@ class OuterEnumTest extends \PHPUnit_Framework_TestCase
 
         /** * @var EnumTest $result */
         $result = ObjectSerializer::deserialize(
-            json_decode($json),
+            json_decode($json, false, 512, JSON_THROW_ON_ERROR),
             EnumTest::class
         );
 
@@ -47,7 +51,7 @@ class OuterEnumTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('approved', $result->getOuterEnum());
     }
 
-    public function testSanitize()
+    public function testSanitize(): void
     {
         $json = "placed";
 
@@ -55,10 +59,10 @@ class OuterEnumTest extends \PHPUnit_Framework_TestCase
             $json
         );
 
-        $this->assertInternalType('string', $result);
+        $this->assertIsString($result);
     }
 
-    public function testSanitizeNested()
+    public function testSanitizeNested(): void
     {
         $input = new EnumTest([
             'enum_string' => 'UPPER',
@@ -71,16 +75,17 @@ class OuterEnumTest extends \PHPUnit_Framework_TestCase
             $input
         );
 
-        $this->assertInternalType('object', $result);
+        $this->assertIsObject($result);
         $this->assertInstanceOf(\stdClass::class, $result);
 
-        $this->assertInternalType('string', $result->outerEnum);
+        $this->assertIsString($result->outerEnum);
         $this->assertEquals('approved', $result->outerEnum);
     }
 
-    public function testSanitizeNestedInvalidValue()
+    public function testSanitizeNestedInvalidValue(): void
     {
-        $this->setExpectedException(\InvalidArgumentException::class, 'Invalid value for enum');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid value for enum');
 
         $input = new EnumTest([
             'enum_string' => 'UPPER',

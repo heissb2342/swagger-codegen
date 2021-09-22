@@ -2,28 +2,28 @@
 
 namespace Swagger\Client;
 
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Api\FakeApi;
 use Swagger\Client\Api\UserApi;
 
 require_once __DIR__ . '/FakeHttpClient.php';
 
-class ParametersTest extends \PHPUnit_Framework_TestCase
+class ParametersTest extends TestCase
 {
-    /** @var  FakeHttpClient */
-    private $fakeHttpClient;
-    /** @var  FakeApi */
-    private $fakeApi;
-    /** @var  UserApi */
-    private $userApi;
+    private FakeHttpClient $fakeHttpClient;
 
-    public function setUp()
+    private FakeApi $fakeApi;
+
+    private UserApi $userApi;
+
+    public function setUp(): void
     {
         $this->fakeHttpClient = new FakeHttpClient();
         $this->fakeApi = new Api\FakeApi($this->fakeHttpClient);
         $this->userApi = new Api\UserApi($this->fakeHttpClient);
     }
 
-    public function testHeaderParam()
+    public function testHeaderParam(): void
     {
         $this->fakeApi->testEnumParameters([], [], [], 'something');
 
@@ -34,7 +34,7 @@ class ParametersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['something'], $headers['enum_header_string']);
     }
 
-    public function testHeaderParamCollection()
+    public function testHeaderParamCollection(): void
     {
         $this->fakeApi->testEnumParameters([], [], ['string1', 'string2']);
 
@@ -45,7 +45,7 @@ class ParametersTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['string1,string2'], $headers['enum_header_string_array']);
     }
 
-    public function testInlineAdditionalProperties()
+    public function testInlineAdditionalProperties(): void
     {
         $param = new \stdClass();
         $param->foo = 'bar';
@@ -54,12 +54,4 @@ class ParametersTest extends \PHPUnit_Framework_TestCase
         $request = $this->fakeHttpClient->getLastRequest();
         $this->assertSame('{"foo":"bar"}', $request->getBody()->getContents());
     }
-
-//    missing example for collection path param in config
-//    public function testPathParamCollection()
-//    {
-//        $this->userApi->getUserByNameWithHttpInfo(['aa', 'bb']);
-//        $request = $this->fakeHttpClient->getLastRequest();
-//        $this->assertEquals('user/aa,bb', urldecode($request->getUri()->getPath()));
-//    }
 }

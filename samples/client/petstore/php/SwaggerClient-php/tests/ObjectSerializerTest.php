@@ -1,25 +1,25 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
 // test object serializer
-class ObjectSerializerTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ObjectSerializerTest extends TestCase
 {
     /**
      * Test the sanitizeForSerialization method with a stdClass.
      */
-    public function testSanitizeForSerializationWithStdClass()
+    public function testSanitizeForSerializationWithStdClass(): void
     {
-        // Initialize the ObjectSerializer.
-        $s = new ObjectSerializer();
-        
         // Build a stdClass object.
         $obj = new \stdClass();
         $obj->prop1 = 'val1';
         $obj->prop2 = 'val2';
-        
+
         // Call the method.
-        $serialized = $s->sanitizeForSerialization($obj);
+        $serialized = ObjectSerializer::sanitizeForSerialization($obj);
 
         // Assert that the stdClass object is sanitized as expected.
         $this->assertEquals('val1', $serialized->prop1);
@@ -27,20 +27,17 @@ class ObjectSerializerTest extends \PHPUnit_Framework_TestCase
     }
     
     // test sanitizeFilename
-    public function testSanitizeFilename()
+    public function testSanitizeFilename(): void
     {
-        // initialize the API client
-        $s = new ObjectSerializer();
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("sun.gif"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("../sun.gif"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("/var/tmp/sun.gif"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("./sun.gif"));
 
-        $this->assertSame("sun.gif", $s->sanitizeFilename("sun.gif"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename("../sun.gif"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename("/var/tmp/sun.gif"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename("./sun.gif"));
-        
-        $this->assertSame("sun", $s->sanitizeFilename("sun"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename("..\sun.gif"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename("\var\tmp\sun.gif"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename("c:\var\tmp\sun.gif"));
-        $this->assertSame("sun.gif", $s->sanitizeFilename(".\sun.gif"));
+        $this->assertSame("sun", ObjectSerializer::sanitizeFilename("sun"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("..\sun.gif"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("\var\tmp\sun.gif"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename("c:\var\tmp\sun.gif"));
+        $this->assertSame("sun.gif", ObjectSerializer::sanitizeFilename(".\sun.gif"));
     }
 }

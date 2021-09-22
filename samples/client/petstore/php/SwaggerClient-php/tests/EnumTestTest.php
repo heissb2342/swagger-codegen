@@ -1,12 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Model\EnumTest;
 
-class EnumTestTest extends \PHPUnit_Framework_TestCase
+class EnumTestTest extends TestCase
 {
-    public function testPossibleValues()
+    public function testPossibleValues(): void
     {
         $this->assertSame(EnumTest::ENUM_STRING_UPPER, "UPPER");
         $this->assertSame(EnumTest::ENUM_STRING_LOWER, "lower");
@@ -16,7 +19,7 @@ class EnumTestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(EnumTest::ENUM_NUMBER_MINUS_1_DOT_2, -1.2);
     }
 
-    public function testStrictValidation()
+    public function testStrictValidation(): void
     {
         $enum = new EnumTest([
             'enum_string' => 0,
@@ -31,16 +34,15 @@ class EnumTestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $enum->listInvalidProperties());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testThrowExceptionWhenInvalidAmbiguousValueHasPassed()
+    public function testThrowExceptionWhenInvalidAmbiguousValueHasPassed(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $enum = new EnumTest();
         $enum->setEnumString(0);
     }
 
-    public function testNonRequiredPropertyIsOptional()
+    public function testNonRequiredPropertyIsOptional(): void
     {
         $enum = new EnumTest([
             'enum_string_required' => 'UPPER',
@@ -49,7 +51,7 @@ class EnumTestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($enum->valid());
     }
 
-    public function testRequiredProperty()
+    public function testRequiredProperty(): void
     {
         $enum = new EnumTest();
         $this->assertSame(["'enum_string_required' can't be null"], $enum->listInvalidProperties());

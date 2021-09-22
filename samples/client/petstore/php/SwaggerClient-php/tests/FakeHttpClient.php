@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
@@ -8,63 +9,51 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 class FakeHttpClient implements ClientInterface
 {
-    /** @var  RequestInterface|null */
-    private $request;
-    /** @var  ResponseInterface|null */
-    private $response;
+    private ?RequestInterface $request;
 
-    /**
-     * @return null|RequestInterface
-     */
-    public function getLastRequest()
+    private ?ResponseInterface $response;
+
+    public function getLastRequest(): ?RequestInterface
     {
         return $this->request;
     }
 
-    /**
-     * @param null|ResponseInterface $response
-     */
-    public function setResponse(ResponseInterface $response = null)
+    public function setResponse(ResponseInterface $response = null): void
     {
         $this->response = $response;
     }
 
     /**
      * Send an HTTP request.
-     *
-     * @param RequestInterface $request Request to send
-     * @param array $options Request options to apply to the given
-     *                                  request and to the transfer.
-     *
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function send(RequestInterface $request, array $options = []): ResponseInterface
     {
         $this->request = $request;
-        return $this->response ?: new Response(200, [], "{}");
+        return $this->response ?? new Response(200, [], "{}");
     }
 
     public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
     {
-        throw new \RuntimeException('not implemented');
+        throw new RuntimeException('not implemented');
     }
 
     public function request($method, $uri, array $options = []): ResponseInterface
     {
-        throw new \RuntimeException('not implemented');
+        throw new RuntimeException('not implemented');
     }
 
     public function requestAsync($method, $uri, array $options = []): PromiseInterface
     {
-        throw new \RuntimeException('not implemented');
+        throw new RuntimeException('not implemented');
     }
 
     public function getConfig($option = null)
     {
-        throw new \RuntimeException('not implemented');
+        throw new RuntimeException('not implemented');
     }
 }

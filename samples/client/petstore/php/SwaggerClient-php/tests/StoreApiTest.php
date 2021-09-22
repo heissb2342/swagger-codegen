@@ -1,27 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Api\PetApi;
 use Swagger\Client\Api\StoreApi;
 use Swagger\Client\Model\Category;
 use Swagger\Client\Model\Pet;
 use Swagger\Client\Model\Tag;
 
-class StoreApiTest extends \PHPUnit_Framework_TestCase
+class StoreApiTest extends TestCase
 {
-    /** @var  StoreApi */
-    private $api;
-
-    public function setUp()
-    {
-        $this->api = new StoreApi();
-    }
+    private StoreApi $api;
 
     /**
      * Setup before running each test case
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         // add a new pet (id 10005) to ensure the pet object is available for all the tests
         // new pet
@@ -46,11 +42,16 @@ class StoreApiTest extends \PHPUnit_Framework_TestCase
         $api->addPet($pet);
     }
 
-    public function testGetInventory()
+    public function setUp(): void
+    {
+        $this->api = new StoreApi();
+    }
+
+    public function testGetInventory(): void
     {
         $result = $this->api->getInventory();
 
-        $this->assertInternalType('array', $result);
-        $this->assertInternalType('int', $result['available']);
+        $this->assertIsArray($result);
+        $this->assertIsInt($result['available']);
     }
 }

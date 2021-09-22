@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Model\FormatTest;
 
-class FormatTestTest extends \PHPUnit_Framework_TestCase
+class FormatTestTest extends TestCase
 {
-    public function testCountTheLengthOfMultiByteStringsCorrectly()
+    public function testCountTheLengthOfMultiByteStringsCorrectly(): void
     {
         $the64MultiByteStrings = '１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０１２３';
 

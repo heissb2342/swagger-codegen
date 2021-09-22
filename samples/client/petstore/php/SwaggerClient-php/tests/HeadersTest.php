@@ -1,20 +1,22 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
+use PHPUnit\Framework\TestCase;
+
 require_once __DIR__ . '/FakeHttpClient.php';
 
-class HeadersTest extends \PHPUnit_Framework_TestCase
+class HeadersTest extends TestCase
 {
-    /** @var  FakeHttpClient */
-    private $fakeHttpClient;
+    private FakeHttpClient $fakeHttpClient;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->fakeHttpClient = new FakeHttpClient();
     }
 
-    public function testUserAgent()
+    public function testUserAgent(): void
     {
         $config = new Configuration();
         $config->setUserAgent('value');

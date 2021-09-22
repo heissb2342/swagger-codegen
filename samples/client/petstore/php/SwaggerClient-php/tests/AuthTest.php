@@ -1,16 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace Swagger\Client;
 
+use PHPUnit\Framework\TestCase;
 use Swagger\Client\Api\FakeApi;
 use Swagger\Client\Api\PetApi;
 use Swagger\Client\Model\Pet;
 
 require_once __DIR__ . '/FakeHttpClient.php';
 
-class AuthTest extends \PHPUnit_Framework_TestCase
+class AuthTest extends TestCase
 {
-    public function testCustomApiKeyHeader()
+    public function testCustomApiKeyHeader(): void
     {
         $authConfig = new Configuration();
         $authConfig->setApiKey('api_key', '123qwe');
@@ -25,7 +27,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['123qwe'], $headers['api_key']);
     }
 
-    public function testApiToken()
+    public function testApiToken(): void
     {
         $authConfig = new Configuration();
         $authConfig->setAccessToken('asd123');
@@ -40,7 +42,7 @@ class AuthTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['Bearer asd123'], $headers['Authorization']);
     }
 
-    public function testBasicAuth()
+    public function testBasicAuth(): void
     {
         $username = 'user';
         $password = 'password';
