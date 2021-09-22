@@ -1,12 +1,13 @@
 <?php
 
-return PhpCsFixer\Config::create()
+$config = new PhpCsFixer\Config();
+return $config
     ->setUsingCache(true)
     ->setRules([
         '@PSR2' => true,
         'ordered_imports' => true,
         'phpdoc_order' => true,
-        'array_syntax' => [ 'syntax' => 'short' ],
+        'array_syntax' => ['syntax' => 'short'],
         'strict_comparison' => true,
         'strict_param' => true,
         'no_trailing_whitespace' => false,
